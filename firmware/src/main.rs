@@ -816,13 +816,17 @@ fn main() -> ! {
     };
     let mut kbd = USBKbd::new(p.USB, &DEVICE_DESCR, config_descr_buf, &mut ctrl_buf);
     kbd.setup();
-    let mut prev = [0u8; 8];
-    let mut curr: Option<[u8; 8]> = None;
+    p.GPIOA.odr.write(|w| {
+        w.odr8().bit(true)
+    });
     loop {
         kbd.usb_poll();
 
         let mut buf = [0u8; 8];
-        buf[2] = 0x04;
+        let bit = p.GPIOB.idr.read().idr5().bit();
+        if bit {
+            buf[2] = 0x04;
+        }
         kbd.hid_send_keys(&buf);
     }
 }
