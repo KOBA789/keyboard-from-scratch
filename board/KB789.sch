@@ -1,0 +1,334 @@
+EESchema Schematic File Version 4
+LIBS:KB789-cache
+EELAYER 29 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title "KB789"
+Date "2019-03-19"
+Rev ""
+Comp "KOBA789"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Switch:SW_Push SW3
+U 1 1 5C909A67
+P 2200 4000
+F 0 "SW3" H 2200 4285 50  0000 C CNN
+F 1 "SW_Push" H 2200 4194 50  0000 C CNN
+F 2 "AI03-MX:MX-1U-NoLED" H 2200 4200 50  0001 C CNN
+F 3 "~" H 2200 4200 50  0001 C CNN
+	1    2200 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW2
+U 1 1 5C9069A7
+P 2200 3000
+F 0 "SW2" H 2200 3285 50  0000 C CNN
+F 1 "SW_Push" H 2200 3194 50  0000 C CNN
+F 2 "AI03-MX:MX-1U-NoLED" H 2200 3200 50  0001 C CNN
+F 3 "~" H 2200 3200 50  0001 C CNN
+	1    2200 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW1
+U 1 1 5C9057B7
+P 2200 2000
+F 0 "SW1" H 2200 2285 50  0000 C CNN
+F 1 "SW_Push" H 2200 2194 50  0000 C CNN
+F 2 "AI03-MX:MX-1U-NoLED" H 2200 2200 50  0001 C CNN
+F 3 "~" H 2200 2200 50  0001 C CNN
+	1    2200 2000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2000 1500 2000 2000
+Connection ~ 2000 2000
+Wire Wire Line
+	2000 2000 2000 3000
+Connection ~ 2000 3000
+Wire Wire Line
+	2000 3000 2000 4000
+Connection ~ 3000 3000
+Wire Wire Line
+	3000 3000 3000 4000
+Wire Wire Line
+	2400 2000 2500 2000
+Wire Wire Line
+	3500 2000 3500 2200
+Wire Wire Line
+	2400 3000 2500 3000
+Wire Wire Line
+	2500 3000 2500 3200
+Wire Wire Line
+	3400 3000 3500 3000
+Wire Wire Line
+	3500 3000 3500 3200
+Wire Wire Line
+	3400 4000 3500 4000
+Wire Wire Line
+	3500 4000 3500 4200
+Wire Wire Line
+	2400 4000 2500 4000
+Wire Wire Line
+	2500 4000 2500 4200
+Wire Wire Line
+	3000 2000 3000 3000
+Connection ~ 3000 2000
+Wire Wire Line
+	3000 1500 3000 2000
+Wire Wire Line
+	3400 2000 3500 2000
+Text GLabel 2000 1500 1    50   Input ~ 0
+COL_0
+Text GLabel 3000 1500 1    50   Input ~ 0
+COL_1
+Text GLabel 4000 3500 2    50   Output ~ 0
+ROW_1
+Text GLabel 4000 4500 2    50   Output ~ 0
+ROW_2
+Text GLabel 4000 2500 2    50   Output ~ 0
+ROW_0
+Text GLabel 7300 3300 0    50   Input ~ 0
+ROW_0
+Text GLabel 7300 3400 0    50   Input ~ 0
+ROW_1
+Text GLabel 7300 3500 0    50   Input ~ 0
+ROW_2
+Wire Wire Line
+	7300 3300 7400 3300
+Wire Wire Line
+	7300 3400 7400 3400
+Wire Wire Line
+	7300 3500 7400 3500
+Text GLabel 7300 2500 0    50   Output ~ 0
+COL_0
+Text GLabel 8600 2300 2    50   Output ~ 0
+COL_1
+Wire Wire Line
+	8600 2300 8500 2300
+Wire Wire Line
+	7300 2500 7400 2500
+$Comp
+L power:GND #PWR0101
+U 1 1 5C91C1FC
+P 7950 4000
+F 0 "#PWR0101" H 7950 3750 50  0001 C CNN
+F 1 "GND" H 7955 3827 50  0000 C CNN
+F 2 "" H 7950 4000 50  0001 C CNN
+F 3 "" H 7950 4000 50  0001 C CNN
+	1    7950 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7950 4000 7950 3900
+$Comp
+L power:+3V3 #PWR0102
+U 1 1 5C91D32D
+P 7950 1800
+F 0 "#PWR0102" H 7950 1650 50  0001 C CNN
+F 1 "+3V3" H 7965 1973 50  0000 C CNN
+F 2 "" H 7950 1800 50  0001 C CNN
+F 3 "" H 7950 1800 50  0001 C CNN
+	1    7950 1800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7950 1800 7950 1900
+NoConn ~ 7400 2100
+NoConn ~ 7400 2200
+NoConn ~ 7400 2300
+NoConn ~ 7400 2400
+NoConn ~ 7400 2600
+NoConn ~ 7400 2700
+NoConn ~ 7400 2800
+NoConn ~ 7400 3000
+NoConn ~ 7400 3100
+NoConn ~ 7400 3200
+NoConn ~ 7400 3600
+NoConn ~ 7400 3700
+NoConn ~ 8500 2100
+NoConn ~ 8500 2400
+NoConn ~ 8500 2500
+NoConn ~ 8500 2600
+NoConn ~ 8500 2700
+NoConn ~ 8500 2800
+NoConn ~ 8500 2900
+NoConn ~ 8500 3000
+NoConn ~ 8500 3100
+NoConn ~ 8500 3200
+NoConn ~ 8500 3300
+NoConn ~ 8500 3400
+NoConn ~ 8500 3500
+NoConn ~ 8500 3600
+NoConn ~ 8500 3700
+NoConn ~ 7850 1900
+NoConn ~ 8050 1900
+$Comp
+L bluepill:Bluepill U1
+U 1 1 5C916CCD
+P 7950 2750
+F 0 "U1" H 7950 2700 50  0000 C CNN
+F 1 "Bluepill" H 7950 2550 50  0000 C CNN
+F 2 "Package_DIP:DIP-40_W15.24mm_Socket" H 7950 2750 50  0001 C CNN
+F 3 "" H 7950 2750 50  0001 C CNN
+	1    7950 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7400 2900 6800 2900
+Wire Wire Line
+	6800 2900 6800 2500
+$Comp
+L Device:R R1
+U 1 1 5C920F30
+P 6800 2350
+F 0 "R1" H 6870 2396 50  0000 L CNN
+F 1 "R" H 6870 2305 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 6730 2350 50  0001 C CNN
+F 3 "~" H 6800 2350 50  0001 C CNN
+	1    6800 2350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6800 2200 6800 2100
+$Comp
+L power:+3V3 #PWR0103
+U 1 1 5C921AEC
+P 6800 2100
+F 0 "#PWR0103" H 6800 1950 50  0001 C CNN
+F 1 "+3V3" H 6815 2273 50  0000 C CNN
+F 2 "" H 6800 2100 50  0001 C CNN
+F 3 "" H 6800 2100 50  0001 C CNN
+	1    6800 2100
+	1    0    0    -1  
+$EndComp
+Wire Bus Line
+	5500 500  5500 7750
+Text Notes 5700 800  0    100  ~ 20
+Blue pill
+Text Notes 650  800  0    100  ~ 20
+key matrix
+Wire Wire Line
+	2500 2500 3500 2500
+Wire Wire Line
+	2500 3500 3500 3500
+Wire Wire Line
+	2500 4500 3500 4500
+$Comp
+L Device:D D1
+U 1 1 5C90C380
+P 2500 2350
+F 0 "D1" V 2454 2478 50  0000 L CNN
+F 1 "DIODE" V 2545 2478 50  0000 L CNN
+F 2 "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal" H 2500 2350 50  0001 C CNN
+F 3 "~" H 2500 2350 50  0001 C CNN
+	1    2500 2350
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	2500 2000 2500 2200
+$Comp
+L Device:D D2
+U 1 1 5C92C41D
+P 2500 3350
+F 0 "D2" V 2454 3478 50  0000 L CNN
+F 1 "DIODE" V 2545 3478 50  0000 L CNN
+F 2 "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal" H 2500 3350 50  0001 C CNN
+F 3 "~" H 2500 3350 50  0001 C CNN
+	1    2500 3350
+	0    1    -1   0   
+$EndComp
+$Comp
+L Device:D D3
+U 1 1 5C92CC70
+P 2500 4350
+F 0 "D3" V 2454 4478 50  0000 L CNN
+F 1 "DIODE" V 2545 4478 50  0000 L CNN
+F 2 "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal" H 2500 4350 50  0001 C CNN
+F 3 "~" H 2500 4350 50  0001 C CNN
+	1    2500 4350
+	0    1    -1   0   
+$EndComp
+$Comp
+L Device:D D6
+U 1 1 5C92D144
+P 3500 2350
+F 0 "D6" V 3454 2478 50  0000 L CNN
+F 1 "DIODE" V 3545 2478 50  0000 L CNN
+F 2 "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal" H 3500 2350 50  0001 C CNN
+F 3 "~" H 3500 2350 50  0001 C CNN
+	1    3500 2350
+	0    1    -1   0   
+$EndComp
+Connection ~ 3500 2500
+Wire Wire Line
+	3500 2500 4000 2500
+$Comp
+L Device:D D5
+U 1 1 5C92D72D
+P 3500 3350
+F 0 "D5" V 3454 3478 50  0000 L CNN
+F 1 "DIODE" V 3545 3478 50  0000 L CNN
+F 2 "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal" H 3500 3350 50  0001 C CNN
+F 3 "~" H 3500 3350 50  0001 C CNN
+	1    3500 3350
+	0    1    -1   0   
+$EndComp
+Connection ~ 3500 3500
+Wire Wire Line
+	3500 3500 4000 3500
+$Comp
+L Device:D D4
+U 1 1 5C92DBD1
+P 3500 4350
+F 0 "D4" V 3454 4478 50  0000 L CNN
+F 1 "DIODE" V 3545 4478 50  0000 L CNN
+F 2 "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal" H 3500 4350 50  0001 C CNN
+F 3 "~" H 3500 4350 50  0001 C CNN
+	1    3500 4350
+	0    1    -1   0   
+$EndComp
+Connection ~ 3500 4500
+Wire Wire Line
+	3500 4500 4000 4500
+$Comp
+L Switch:SW_Push SW6
+U 1 1 5C90C06A
+P 3200 2000
+F 0 "SW6" H 3200 2285 50  0000 C CNN
+F 1 "SW_Push" H 3200 2194 50  0000 C CNN
+F 2 "AI03-MX:MX-1U-NoLED" H 3200 2200 50  0001 C CNN
+F 3 "~" H 3200 2200 50  0001 C CNN
+	1    3200 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW5
+U 1 1 5C90C064
+P 3200 3000
+F 0 "SW5" H 3200 3285 50  0000 C CNN
+F 1 "SW_Push" H 3200 3194 50  0000 C CNN
+F 2 "AI03-MX:MX-1U-NoLED" H 3200 3200 50  0001 C CNN
+F 3 "~" H 3200 3200 50  0001 C CNN
+	1    3200 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW4
+U 1 1 5C90C05E
+P 3200 4000
+F 0 "SW4" H 3200 4285 50  0000 C CNN
+F 1 "SW_Push" H 3200 4194 50  0000 C CNN
+F 2 "AI03-MX:MX-1U-NoLED" H 3200 4200 50  0001 C CNN
+F 3 "~" H 3200 4200 50  0001 C CNN
+	1    3200 4000
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
