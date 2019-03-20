@@ -17,6 +17,6 @@ cargo objcopy --bin kb789-blink --release -- -O binary app.bin
 ```
 dfu-util -d 1209:db42 -D app.bin
 ```
-このとき、コマンド実行前にリセットボタンを押し、それから数秒以内に上記コマンドを実行してください。
+このとき、Blue pill 上の LED が点灯していなければ RESET ボタンを1度押し、ブートローダに入ってください。
 
 なお、`1209:db42` は[ブートローダ dapboot の VID/PID](https://github.com/koba789/dapboot#usb-vidpid) です。
