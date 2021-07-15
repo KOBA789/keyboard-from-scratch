@@ -5,11 +5,11 @@ authors = ["Hidekazu Kobayashi <hidekazu-kobayashi@cookpad.com>"]
 edition = "2018"
 
 [dependencies]
-cortex-m = "0.5"
+cortex-m = "0.7"
 cortex-m-rt = { version = "0.6", features = ["device"] }
-cortex-m-semihosting = "0.3.2"
+cortex-m-semihosting = "0.3.7"
 panic-halt = "0.2"
-stm32f1 = { version = "0.6", features = ["rt", "stm32f103"] }
+stm32f1 = { version = "0.13", features = ["rt", "stm32f103"] }
 volatile-register = "0.2"
 vcell = "0.1.0"
 
