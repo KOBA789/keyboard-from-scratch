@@ -44,6 +44,7 @@ impl BTableTxEntry {
         unsafe { self.count.set(value) }
     }
 
+    #[allow(clippy::mut_from_ref)]
     pub unsafe fn as_slice_mut(&self, len: usize) -> &mut [VolatileCell<u16>] {
         let addr = self.addr() as u32 * 2 + PMA_BASE;
         slice::from_raw_parts_mut(addr as *mut VolatileCell<u16>, len)
@@ -76,11 +77,11 @@ impl BTableRxEntry {
         if min_size > 62 {
             let num_block = ((min_size - 1) >> 5) & 0b1_1111;
             self.set_count((num_block | 0b10_0000) << 10);
-            return (num_block + 1) << 5;
+            (num_block + 1) << 5
         } else {
             let num_block = (min_size + 1) >> 1;
             self.set_count(num_block << 10);
-            return num_block << 1;
+            num_block << 1
         }
     }
 

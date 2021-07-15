@@ -1,11 +1,10 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_halt;
+use panic_halt as _;
 
 use core::cmp;
 
-use cortex_m;
 use cortex_m_rt::entry;
 use stm32f1::stm32f103;
 use stm32f103::USB as USBRegs;
@@ -14,10 +13,10 @@ use vcell::VolatileCell;
 #[allow(unused_imports)]
 use cortex_m_semihosting::hprintln;
 
-mod gpio;
-mod descr;
-mod pma;
 mod cursor;
+mod descr;
+mod gpio;
+mod pma;
 
 use cursor::{ReadCursor, WriteCursor};
 
@@ -92,38 +91,10 @@ static CONFIG_DESCR: CompositeConfigDescriptor = CompositeConfigDescriptor {
 };
 
 static HID_REPORT_DESCR: &[u8] = &[
-    0x05, 0x01,
-    0x09, 0x06,
-    0xA1, 0x01,
-    0x05, 0x07,
-    0x19, 0xE0,
-    0x29, 0xE7,
-    0x15, 0x00,
-    0x25, 0x01,
-    0x75, 0x01,
-    0x95, 0x08,
-    0x81, 0x02,
-    0x95, 0x01,
-    0x75, 0x08,
-    0x81, 0x01,
-    0x95, 0x06,
-    0x75, 0x01,
-    0x05, 0x08,
-    0x19, 0x01,
-    0x29, 0x05,
-    0x91, 0x02,
-    0x95, 0x01,
-    0x75, 0x03,
-    0x91, 0x01,
-    0x95, 0x06,
-    0x75, 0x08,
-    0x15, 0x00,
-    0x25, 0x65,
-    0x05, 0x07,
-    0x19, 0x00,
-    0x29, 0x65,
-    0x81, 0x00,
-    0xC0
+    0x05, 0x01, 0x09, 0x06, 0xA1, 0x01, 0x05, 0x07, 0x19, 0xE0, 0x29, 0xE7, 0x15, 0x00, 0x25, 0x01,
+    0x75, 0x01, 0x95, 0x08, 0x81, 0x02, 0x95, 0x01, 0x75, 0x08, 0x81, 0x01, 0x95, 0x06, 0x75, 0x01,
+    0x05, 0x08, 0x19, 0x01, 0x29, 0x05, 0x91, 0x02, 0x95, 0x01, 0x75, 0x03, 0x91, 0x01, 0x95, 0x06,
+    0x75, 0x08, 0x15, 0x00, 0x25, 0x65, 0x05, 0x07, 0x19, 0x00, 0x29, 0x65, 0x81, 0x00, 0xC0,
 ];
 
 static STRINGS: &[&str] = &["KOBA789", "KB789 MK-C", "789"];
@@ -139,22 +110,27 @@ fn setup_clock(rcc: &stm32f103::RCC, flash: &stm32f103::FLASH) {
 
     flash.acr.write(|w| unsafe { w.latency().bits(0b010) });
 
-    rcc.cfgr.write(|w| w
-        .sw().hse()
-        .hpre().div1()
-        .adcpre().div8()
-        .ppre1().div2()
-        .ppre2().div1()
-        .pllmul().mul9()
-        .pllsrc().hse_div_prediv()
-        .pllxtpre().div1()
-    );
+    rcc.cfgr.write(|w| {
+        w.sw()
+            .hse()
+            .hpre()
+            .div1()
+            .adcpre()
+            .div8()
+            .ppre1()
+            .div2()
+            .ppre2()
+            .div1()
+            .pllmul()
+            .mul9()
+            .pllsrc()
+            .hse_div_prediv()
+            .pllxtpre()
+            .div1()
+    });
 
-    rcc.cr.write(|w| w
-        .hsion().set_bit()
-        .hseon().set_bit()
-        .pllon().set_bit()
-    );
+    rcc.cr
+        .write(|w| w.hsion().set_bit().hseon().set_bit().pllon().set_bit());
     while rcc.cr.read().pllrdy().bit_is_clear() {}
     rcc.cfgr.write(|w| w.sw().pll());
 }
@@ -249,7 +225,7 @@ impl EPAddr {
     fn from(dir: Direction, ep_id: u8) -> Self {
         match dir {
             Direction::DeviceToHost => Self::new(ep_id | 0x80),
-            Direction::HostToDevice => Self::new(ep_id)
+            Direction::HostToDevice => Self::new(ep_id),
         }
     }
 
@@ -314,15 +290,18 @@ mod ep {
     use stm32f1::stm32f103::usb::epr::{R as EPR_R, W as EPR_W};
 
     pub fn invariant(w: &mut EPR_W) -> &mut EPR_W {
-        unsafe {
-            w
-                .ctr_rx().set_bit()
-                .dtog_rx().clear_bit()
-                .stat_rx().bits(0)
-                .ctr_tx().set_bit()
-                .dtog_tx().clear_bit()
-                .stat_tx().bits(0)
-        }
+        w.ctr_rx()
+            .set_bit()
+            .dtog_rx()
+            .clear_bit()
+            .stat_rx()
+            .bits(0)
+            .ctr_tx()
+            .set_bit()
+            .dtog_tx()
+            .clear_bit()
+            .stat_tx()
+            .bits(0)
     }
 
     pub fn clear_tx_dtog<'w>(r: &EPR_R, w: &'w mut EPR_W) -> &'w mut EPR_W {
@@ -333,40 +312,56 @@ mod ep {
     }
 
     pub fn set_tx_stat<'w>(r: &EPR_R, w: &'w mut EPR_W, stat: u8) -> &'w mut EPR_W {
-        unsafe {
-            w.stat_tx().bits(r.stat_tx().bits() ^ stat)
-        }
+        w.stat_tx().bits(r.stat_tx().bits() ^ stat)
     }
     pub fn set_rx_stat<'w>(r: &EPR_R, w: &'w mut EPR_W, stat: u8) -> &'w mut EPR_W {
-        unsafe {
-            w.stat_rx().bits(r.stat_rx().bits() ^ stat)
-        }
+        w.stat_rx().bits(r.stat_rx().bits() ^ stat)
     }
 }
 
 #[allow(dead_code)]
 enum ControlState<'a> {
-    Idle        { buf: &'a mut [u8] },
-    Stalled     { buf: &'a mut [u8] },
-	DataIn      { cur: ReadCursor<'a>, req: DeviceRequest },
-    LastDataIn  { cur: ReadCursor<'a>, req: DeviceRequest },
-    StatusIn    { buf: &'a mut [u8] },
-	DataOut     { cur: WriteCursor<'a>, req: DeviceRequest },
-    LastDataOut { cur: WriteCursor<'a>, req: DeviceRequest },
-    StatusOut   { buf: &'a mut [u8] },
+    Idle {
+        buf: &'a mut [u8],
+    },
+    Stalled {
+        buf: &'a mut [u8],
+    },
+    DataIn {
+        cur: ReadCursor<'a>,
+        req: DeviceRequest,
+    },
+    LastDataIn {
+        cur: ReadCursor<'a>,
+        req: DeviceRequest,
+    },
+    StatusIn {
+        buf: &'a mut [u8],
+    },
+    DataOut {
+        cur: WriteCursor<'a>,
+        req: DeviceRequest,
+    },
+    LastDataOut {
+        cur: WriteCursor<'a>,
+        req: DeviceRequest,
+    },
+    StatusOut {
+        buf: &'a mut [u8],
+    },
 }
 impl<'a> ControlState<'a> {
     fn into_buf(self) -> &'a mut [u8] {
         use ControlState::*;
         match self {
-            Idle        { buf } => buf,
-            Stalled     { buf } => buf,
-            DataIn      { cur, .. } => cur.into(),
-            LastDataIn  { cur, .. } => cur.into(),
-            StatusIn    { buf } => buf,
-            DataOut     { cur, .. } => cur.into(),
+            Idle { buf } => buf,
+            Stalled { buf } => buf,
+            DataIn { cur, .. } => cur.into(),
+            LastDataIn { cur, .. } => cur.into(),
+            StatusIn { buf } => buf,
+            DataOut { cur, .. } => cur.into(),
             LastDataOut { cur, .. } => cur.into(),
-            StatusOut   { buf } => buf,
+            StatusOut { buf } => buf,
         }
     }
 }
@@ -386,11 +381,8 @@ struct USBKbd<'a> {
     pm_top: u16,
 }
 
-unsafe fn any_as_u8_slice<'a, T: Sized>(p: &'a T) -> &'a [u8] {
-    core::slice::from_raw_parts(
-        (p as *const T) as *const u8,
-        core::mem::size_of::<T>(),
-    )
+unsafe fn any_as_u8_slice<T: Sized>(p: &T) -> &[u8] {
+    core::slice::from_raw_parts((p as *const T) as *const u8, core::mem::size_of::<T>())
 }
 
 impl<'a> USBKbd<'a> {
@@ -398,7 +390,7 @@ impl<'a> USBKbd<'a> {
         regs: USBRegs,
         device_descr: &'static descr::DeviceDescriptor,
         config_descr: &'static [u8],
-        ctrl_buf: &'a mut [u8]
+        ctrl_buf: &'a mut [u8],
     ) -> Self {
         USBKbd {
             regs,
@@ -412,25 +404,26 @@ impl<'a> USBKbd<'a> {
 
     fn setup(&mut self) {
         self.reset();
-        self.regs.cntr.write(|w| w
-            .pdwn().clear_bit()
-            .resetm().set_bit()
-            .ctrm().set_bit()
-        );
+        self.regs
+            .cntr
+            .write(|w| w.pdwn().clear_bit().resetm().set_bit().ctrm().set_bit());
         self.regs.cntr.modify(|_, w| w.fres().clear_bit());
     }
 
     fn set_addr(&self, addr: u8) {
-        self.regs.daddr.modify(|_, w| unsafe { w
-            .add().bits(addr)
-            .ef().set_bit()
-        });
+        self.regs
+            .daddr
+            .modify(|_, w| w.add().bits(addr).ef().set_bit());
     }
 
     fn reset(&mut self) {
         self.regs.istr.reset();
         self.pm_top = pma::BTABLE_SIZE;
-        self.ep_setup(EPAddr::new(0), EPType::Control, self.device_descr.bMaxPacketSize0 as u16);
+        self.ep_setup(
+            EPAddr::new(0),
+            EPType::Control,
+            self.device_descr.bMaxPacketSize0 as u16,
+        );
         self.set_addr(0);
     }
 
@@ -454,15 +447,13 @@ impl<'a> USBKbd<'a> {
     }
 
     fn ep_clear_ctr_tx(&mut self, ep_id: u8) {
-        self.epr(ep_id).modify(|_, w| {
-            ep::invariant(w).ctr_tx().clear_bit()
-        });
+        self.epr(ep_id)
+            .modify(|_, w| ep::invariant(w).ctr_tx().clear_bit());
     }
 
     fn ep_clear_ctr_rx(&mut self, ep_id: u8) {
-        self.epr(ep_id).modify(|_, w| {
-            ep::invariant(w).ctr_rx().clear_bit()
-        });
+        self.epr(ep_id)
+            .modify(|_, w| ep::invariant(w).ctr_rx().clear_bit());
     }
 
     fn ep_stall(&mut self, addr: EPAddr) {
@@ -475,7 +466,7 @@ impl<'a> USBKbd<'a> {
             };
             match addr.dir() {
                 Direction::HostToDevice => ep::set_rx_stat(r, w, EPStat::Stall.bits()),
-                Direction::DeviceToHost =>ep::set_tx_stat(r, w, EPStat::Stall.bits()),
+                Direction::DeviceToHost => ep::set_tx_stat(r, w, EPStat::Stall.bits()),
             }
         });
     }
@@ -485,9 +476,7 @@ impl<'a> USBKbd<'a> {
             let epr = self.epr(addr.ep_id());
             epr.modify(|_, w| {
                 let w = ep::invariant(w);
-                w
-                    .ea().bits(addr.bits())
-                    .ep_type().bits(ep_type.bits())
+                w.ea().bits(addr.bits()).ep_type().bits(ep_type.bits())
             });
         }
 
@@ -531,7 +520,7 @@ impl<'a> USBKbd<'a> {
             let w = ep::invariant(w);
             ep::set_tx_stat(r, w, EPStat::Valid.bits())
         });
-        return Some(());
+        Some(())
     }
 
     fn ep_read_packet(&mut self, addr: EPAddr, buf: &mut [u8]) -> Option<()> {
@@ -546,7 +535,7 @@ impl<'a> USBKbd<'a> {
             let w = ep::invariant(w);
             ep::set_rx_stat(r, w, EPStat::Valid.bits())
         });
-        return Some(());
+        Some(())
     }
 
     fn ctrl_transition<F>(&mut self, cb: F)
@@ -574,11 +563,13 @@ impl<'a> USBKbd<'a> {
                 StatusOut { buf, .. } => {
                     this.ep_read_packet(EPAddr::new(0), &mut []);
                     ControlState::Idle { buf }
-                },
+                }
                 _ => {
                     this.ep_stall(EPAddr::new(0));
-                    ControlState::Stalled { buf: state.into_buf() }
-                },
+                    ControlState::Stalled {
+                        buf: state.into_buf(),
+                    }
+                }
             }
         });
     }
@@ -586,9 +577,7 @@ impl<'a> USBKbd<'a> {
     fn ctrl_read_req(&mut self) -> DeviceRequest {
         let mut buf = [0u8; core::mem::size_of::<DeviceRequest>()];
         self.ep_read_packet(EPAddr::new(0), &mut buf).unwrap();
-        unsafe {
-            core::mem::transmute(buf)
-        }
+        unsafe { core::mem::transmute(buf) }
     }
 
     fn ctrl_handle_setup(&mut self) {
@@ -610,12 +599,16 @@ impl<'a> USBKbd<'a> {
             match this.ctrl_handle_read_request(&req, &mut wcur) {
                 RequestStatus::NotSupported => {
                     this.ep_stall(EPAddr::new(0));
-                    ControlState::Stalled { buf: wcur.into_buf() }
-                },
+                    ControlState::Stalled {
+                        buf: wcur.into_buf(),
+                    }
+                }
                 RequestStatus::Handled => {
                     if req.wLength == 0 {
                         this.ep_write_packet(EPAddr::new(0), &[]).unwrap();
-                        ControlState::StatusIn { buf: wcur.into_buf() }
+                        ControlState::StatusIn {
+                            buf: wcur.into_buf(),
+                        }
                     } else {
                         let cur = wcur.into_read();
                         this.ctrl_send_chunk(cur, req)
@@ -629,7 +622,11 @@ impl<'a> USBKbd<'a> {
         self.ctrl_handle_write_request(req, &[]);
     }
 
-    fn ctrl_handle_read_request(&mut self, req: &DeviceRequest, wcur: &mut WriteCursor<'a>) -> RequestStatus {
+    fn ctrl_handle_read_request(
+        &mut self,
+        req: &DeviceRequest,
+        wcur: &mut WriteCursor<'a>,
+    ) -> RequestStatus {
         let mut str_buf = [0u8; 64];
         match req.bRequest {
             0x05 => {
@@ -638,17 +635,13 @@ impl<'a> USBKbd<'a> {
                 //self.set_addr(req.wValue as u8);
                 //hprintln!("{:x?}", req.wValue);
                 RequestStatus::Handled
-            },
+            }
             0x06 => {
                 // GET_DESCRIPTOR
                 let descr_index = req.wValue & 0xff;
                 let bytes = match req.wValue & 0xff00 {
-                    0x0100 => {
-                        unsafe { any_as_u8_slice(&*self.device_descr) }
-                    },
-                    0x0200 => {
-                        self.config_descr
-                    },
+                    0x0100 => unsafe { any_as_u8_slice(&*self.device_descr) },
+                    0x0200 => self.config_descr,
                     0x0300 => {
                         if descr_index == 0 {
                             descr::STRING_DESCR0
@@ -657,58 +650,52 @@ impl<'a> USBKbd<'a> {
                             let len = descr::build_string_descr(&mut str_buf, str_data).unwrap();
                             &str_buf[0..len]
                         }
-                    },
-                    0x2200 => {
-                        HID_REPORT_DESCR
-                    },
+                    }
+                    0x2200 => HID_REPORT_DESCR,
                     _ => {
                         return RequestStatus::NotSupported;
-                    },
+                    }
                 };
                 let len = cmp::min(req.wLength as usize, bytes.len());
                 wcur.write(&bytes[0..len]);
                 RequestStatus::Handled
-            },
+            }
             0x09 => {
                 // SET_CONFIGURATION
                 self.ep_setup(EPAddr::new(0x81), EPType::Interrupt, 8);
                 RequestStatus::Handled
-            },
+            }
             _ => RequestStatus::NotSupported,
         }
     }
 
-    fn ctrl_handle_write_request(&mut self, _req: DeviceRequest, _buf: &[u8]) {
-
-    }
+    fn ctrl_handle_write_request(&mut self, _req: DeviceRequest, _buf: &[u8]) {}
 
     fn ctrl_handle_in(&mut self) {
         use ControlState::*;
-        self.ctrl_transition(|this, state| {
-            match state {
-                DataIn { cur, req } => {
-                    this.ctrl_send_chunk(cur, req)
-                },
-                LastDataIn { cur, .. } => {
-                    this.epr(0).modify(|r, w| {
-                        let w = ep::invariant(w);
-                        ep::set_rx_stat(r, w, EPStat::Valid.bits())
-                    });
-                    this.ep_read_packet(EPAddr::new(0), &mut []);
-                    let buf = cur.into_buf();
-                    ControlState::StatusOut { buf }
-                },
-                StatusIn { buf, .. } => {
-                    if let Some(addr) = this.pending_addr {
-                        this.set_addr(addr);
-                        this.pending_addr = None;
-                    }
-                    ControlState::Idle { buf }
-                },
-                _ => {
-                    this.ep_stall(EPAddr::new(0));
-                    ControlState::Stalled { buf: state.into_buf() }
-                },
+        self.ctrl_transition(|this, state| match state {
+            DataIn { cur, req } => this.ctrl_send_chunk(cur, req),
+            LastDataIn { cur, .. } => {
+                this.epr(0).modify(|r, w| {
+                    let w = ep::invariant(w);
+                    ep::set_rx_stat(r, w, EPStat::Valid.bits())
+                });
+                this.ep_read_packet(EPAddr::new(0), &mut []);
+                let buf = cur.into_buf();
+                ControlState::StatusOut { buf }
+            }
+            StatusIn { buf, .. } => {
+                if let Some(addr) = this.pending_addr {
+                    this.set_addr(addr);
+                    this.pending_addr = None;
+                }
+                ControlState::Idle { buf }
+            }
+            _ => {
+                this.ep_stall(EPAddr::new(0));
+                ControlState::Stalled {
+                    buf: state.into_buf(),
+                }
             }
         });
     }
@@ -727,9 +714,7 @@ impl<'a> USBKbd<'a> {
         }
     }
 
-    fn hid_handle_in(&mut self) {
-       
-    }
+    fn hid_handle_in(&mut self) {}
 
     fn hid_send_keys(&mut self, keys: &[u8]) -> Option<()> {
         self.ep_write_packet(EPAddr::new(0x81), keys)
@@ -756,7 +741,7 @@ impl<'a> USBKbd<'a> {
                 match ep_id {
                     0 => self.ctrl_handle_in(),
                     1 => self.hid_handle_in(),
-                    _ => {},
+                    _ => {}
                 }
             }
         }
@@ -768,37 +753,45 @@ fn main() -> ! {
     let p = stm32f103::Peripherals::take().unwrap();
     setup_clock(&p.RCC, &p.FLASH);
 
-    p.RCC.apb2enr.write(|w| {
-        w
-            .iopaen().set_bit()
-            .iopben().set_bit()
-            .iopcen().set_bit()
+    p.RCC
+        .apb2enr
+        .write(|w| w.iopaen().set_bit().iopben().set_bit().iopcen().set_bit());
+    p.RCC.apb1enr.write(|w| w.usben().set_bit());
+    p.GPIOA.crh.write(|w| {
+        w.mode8()
+            .bits(gpio::Mode::Output2MHz.bits())
+            .cnf8()
+            .bits(gpio::OutputCnf::Pushpull.bits())
+            .mode12()
+            .bits(gpio::Mode::Output50MHz.bits())
+            .cnf12()
+            .bits(gpio::OutputCnf::Pushpull.bits())
     });
-    p.RCC.apb1enr.write(|w| {
-        w
-            .usben().set_bit()
+    p.GPIOB.crl.write(|w| {
+        w.mode5()
+            .bits(gpio::Mode::Input.bits())
+            .cnf5()
+            .bits(gpio::InputCnf::PullUpdown.bits())
+            .mode6()
+            .bits(gpio::Mode::Input.bits())
+            .cnf6()
+            .bits(gpio::InputCnf::PullUpdown.bits())
+            .mode7()
+            .bits(gpio::Mode::Input.bits())
+            .cnf7()
+            .bits(gpio::InputCnf::PullUpdown.bits())
     });
-    p.GPIOA.crh.write(|w| unsafe { w
-        .mode8().bits(gpio::Mode::Output2MHz.bits())
-        .cnf8().bits(gpio::OutputCnf::Pushpull.bits())
-        .mode12().bits(gpio::Mode::Output50MHz.bits())
-        .cnf12().bits(gpio::OutputCnf::Pushpull.bits())
+    p.GPIOB.crh.write(|w| {
+        w.mode11()
+            .bits(gpio::Mode::Output2MHz.bits())
+            .cnf11()
+            .bits(gpio::OutputCnf::Pushpull.bits())
     });
-    p.GPIOB.crl.write(|w| unsafe { w
-        .mode5().bits(gpio::Mode::Input.bits())
-        .cnf5().bits(gpio::InputCnf::PullUpdown.bits())
-        .mode6().bits(gpio::Mode::Input.bits())
-        .cnf6().bits(gpio::InputCnf::PullUpdown.bits())
-        .mode7().bits(gpio::Mode::Input.bits())
-        .cnf7().bits(gpio::InputCnf::PullUpdown.bits())
-    });
-    p.GPIOB.crh.write(|w| unsafe { w
-        .mode11().bits(gpio::Mode::Output2MHz.bits())
-        .cnf11().bits(gpio::OutputCnf::Pushpull.bits())
-    });
-    p.GPIOC.crh.write(|w| unsafe { w
-        .mode13().bits(gpio::Mode::Output2MHz.bits())
-        .cnf13().bits(gpio::OutputCnf::Opendrain.bits())
+    p.GPIOC.crh.write(|w| {
+        w.mode13()
+            .bits(gpio::Mode::Output2MHz.bits())
+            .cnf13()
+            .bits(gpio::OutputCnf::Opendrain.bits())
     });
 
     p.GPIOA.odr.write(|w| w.odr12().clear_bit());
@@ -806,19 +799,19 @@ fn main() -> ! {
         cortex_m::asm::nop();
     }
 
-    unsafe { pma::fill_with_zero(); }
+    unsafe {
+        pma::fill_with_zero();
+    }
     let mut ctrl_buf = [0u8; 128];
     let config_descr_buf = unsafe {
         core::slice::from_raw_parts(
             (&CONFIG_DESCR as *const CompositeConfigDescriptor) as *const u8,
-            core::mem::size_of::<CompositeConfigDescriptor>()
+            core::mem::size_of::<CompositeConfigDescriptor>(),
         )
     };
     let mut kbd = USBKbd::new(p.USB, &DEVICE_DESCR, config_descr_buf, &mut ctrl_buf);
     kbd.setup();
-    p.GPIOA.odr.write(|w| {
-        w.odr8().bit(true)
-    });
+    p.GPIOA.odr.write(|w| w.odr8().bit(true));
     loop {
         kbd.usb_poll();
 

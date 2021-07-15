@@ -1,5 +1,4 @@
 use core::cmp;
-use core::convert::Into;
 
 #[derive(Debug)]
 pub struct ReadCursor<'a> {
@@ -45,9 +44,9 @@ impl<'a> ReadCursor<'a> {
         self.buf
     }
 }
-impl<'a> Into<&'a mut [u8]> for ReadCursor<'a> {
-    fn into(self) -> &'a mut [u8] {
-        self.into_buf()
+impl<'a> From<ReadCursor<'a>> for &'a mut [u8] {
+    fn from(val: ReadCursor<'a>) -> Self {
+        val.into_buf()
     }
 }
 
@@ -91,8 +90,9 @@ impl<'a> WriteCursor<'a> {
         ReadCursor::with_len(self.into_buf(), len)
     }
 }
-impl<'a> Into<&'a mut [u8]> for WriteCursor<'a> {
-    fn into(self) -> &'a mut [u8] {
-        self.into_buf()
+
+impl<'a> From<WriteCursor<'a>> for &'a mut [u8] {
+    fn from(val: WriteCursor<'a>) -> Self {
+        val.into_buf()
     }
 }
